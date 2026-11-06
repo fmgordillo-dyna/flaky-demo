@@ -1,0 +1,22 @@
+name: touch-pr-branches
+
+on:
+  schedule:
+    - cron: "43 */4 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run the tests on the long-lived PR branches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for branch in demo/pr-a demo/pr-b; do
+            gh workflow run flaky.yml --ref "$branch" || echo "skipped $branch"
+          done
