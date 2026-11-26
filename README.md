@@ -1,20 +1,16 @@
 # flaky-radar-demo
 
-Playwright Test project that produces known flaky tests and reports every test attempt to Flaky Radar as schema v0
-events. Tests are plain Node tests, no browser. Use it to check that the Flaky Radar classification matches what
-the tests do.
-
-Schema v0 spec: "Event schema v0". `scripts/schemaV0.ts` is this repo's copy of the type.
+Playwright Test project that produces known flaky tests and reports every test attempt to Flaky Radar with
+[`fmgordillo-dyna/flaky-radar-action`](https://github.com/fmgordillo-dyna/flaky-radar-action). Tests are plain Node
+tests, no browser. Use it to check that the Flaky Radar classification matches what the tests do.
 
 ## How it works
 
 - Each CI run derives its randomness from the run id (`tests/chance.ts`). Reproduce a run with
   `DEMO_SEED=<run id> npm test`. Without a seed the local seed is fixed.
 - `npm test` runs with 2 retries and writes `results.json` (Playwright JSON reporter).
-- `npm run upload` maps `results.json` to schema v0 and sends one bulk POST. It never retries, never fails the
-  build, and logs a skip when `FLAKY_INGEST_URL` or `FLAKY_INGEST_TOKEN` is missing (forks) or when it does not
-  run in GitHub Actions. Delete it when the Playwright reporter of PAPA-37663 exists.
-- Labels: `flaky.synthetic: false`, `flaky.source.name: "playwright-demo"`, `flaky.test.tags: ["demo"]`.
+- The upload step sends `results.json` to the Dynatrace built-in events endpoint. It never retries, never fails the
+  build, and skips with a notice when the secrets are missing (forks).
 
 ## Expected classification
 
@@ -34,7 +30,8 @@ Schema v0 spec: "Event schema v0". `scripts/schemaV0.ts` is this repo's copy of 
 - `flaky.yml`: every 2 hours on `main`, on `workflow_dispatch` and on pull requests.
 - `touch-pr-branches.yml`: every 4 hours dispatches `flaky.yml` on the long-lived branches `demo/pr-a` and
   `demo/pr-b`, so there is always `pr` data. Create both branches from `main`.
-- Secrets: `FLAKY_INGEST_URL` (the ingest source endpoint) and `FLAKY_INGEST_TOKEN` (ingest scope only).
+- Secrets: `DT_URL` (environment URL without `.apps`) and `DT_TOKEN` (platform token, `openpipeline:events:ingest`
+  only).
 
 ## Verify by hand
 

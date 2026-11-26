@@ -8,8 +8,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "playwright test",
-    "upload": "node scripts/upload.ts"
+    "test": "playwright test"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0",
