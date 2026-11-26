@@ -10,5 +10,5 @@
     "erasableSyntaxOnly": true,
     "skipLibCheck": true
   },
-  "include": ["tests", "scripts", "playwright.config.ts"]
+  "include": ["tests", "playwright.config.ts"]
 }
